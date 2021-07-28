@@ -11,11 +11,12 @@ starFusion workflow runs the following command (excerpt from .wdl file).
  * CHIMERIC_JUNCTIONS - input file with chimeric junctions information (STAR output)
 
 ```
-  STARFUSION_PATH \
-  --genome_lib_dir REF_GENOME_DIR \
-  --left_fq  FASTQR1_01, FASTQR1_02, ... \
-  --right_fq FASTQR2_01, FASTQR2_02, ... \
-  --examine_coding_effect \
+  STARFUSION_PATH
+  --genome_lib_dir REF_GENOME_DIR
+  --left_fq  FASTQR1_01, FASTQR1_02, ... 
+  --right_fq FASTQR2_01, FASTQR2_02, ...
+  --examine_coding_effect 
   --CPU THREADS --chimeric_junction CHIMERIC_JUNCTIONS
+
 ```
 
