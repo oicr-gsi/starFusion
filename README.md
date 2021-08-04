@@ -2,8 +2,6 @@
 
 Workflow that takes a fastq pair or optionally a chimeric file from STAR and detects RNA-seq fusion events.
 
-## Overview
-
 ## Dependencies
 
 * [star-fusion-genome 1.8.1-hg38](https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/__genome_libs_StarFv1.8)
@@ -50,29 +48,31 @@ Output | Type | Description
 `fusionsAbridged`|File|Abridged fusion output tsv
 `fusionCodingEffects`|File|Annotated fusion output tsv
 
+
 ## Commands
-
-This section lists command(s) run by starFusion workflow
-
-starFusion workflow runs the following command (excerpt from .wdl file). 
-
- * STARFUSION_PATH  - path to starFusion program
- * REF_GENOME_DIR   - directory with reference genome file
- * FASTQR* - input fastq files.
- * THREADS - threads to use
- * CHIMERIC_JUNCTIONS - input file with chimeric junctions information (STAR output)
-
-```
-  STARFUSION_PATH \
-  --genome_lib_dir REF_GENOME_DIR \
-  --left_fq  FASTQR1_01, FASTQR1_02, ... \
-  --right_fq FASTQR2_01, FASTQR2_02, ... \
-  --examine_coding_effect \
-  --CPU THREADS --chimeric_junction CHIMERIC_JUNCTIONS
-```
-
-## Support
+ 
+ This section lists command(s) run by starFusion workflow
+ 
+ starFusion workflow runs the following command (excerpt from .wdl file). 
+ 
+  * STARFUSION_PATH  - path to starFusion program
+  * REF_GENOME_DIR   - directory with reference genome file
+  * FASTQR* - input fastq files.
+  * THREADS - threads to use
+  * CHIMERIC_JUNCTIONS - input file with chimeric junctions information (STAR output)
+ 
+ ```
+   STARFUSION_PATH
+   --genome_lib_dir REF_GENOME_DIR
+   --left_fq  FASTQR1_01, FASTQR1_02, ... 
+   --right_fq FASTQR2_01, FASTQR2_02, ...
+   --examine_coding_effect 
+   --CPU THREADS --chimeric_junction CHIMERIC_JUNCTIONS
+ 
+ ```
+ 
+ ## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
 
-_Generated with wdl_doc_gen (https://github.com/oicr-gsi/wdl_doc_gen/)_
+_Generated with generate-markdown-readme (https://github.com/oicr-gsi/gsi-wdl-tools/)_
