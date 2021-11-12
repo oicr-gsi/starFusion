@@ -5,5 +5,8 @@ set -o pipefail
 
 cd $1
 
-find . -regex '.*\.tsv$' -exec wc -l {} \;
-ls *.tsv | sed 's/.*\.//' | sort | uniq -c
+# - .tsv files have no stochastic content, may be md5sum-checked
+
+echo ".tsv files:"
+for f in *.tsv;do md5sum $f;done | sort -V
+
