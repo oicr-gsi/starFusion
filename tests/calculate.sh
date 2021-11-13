@@ -8,5 +8,4 @@ cd $1
 # - .tsv files have no stochastic content, may be md5sum-checked
 
 echo ".tsv files:"
-for f in *.tsv;do md5sum $f;done | sort -V
-
+for f in *predictions.abridged*.tsv;do sort -k 1,2 $f | md5sum;done | sort -V
