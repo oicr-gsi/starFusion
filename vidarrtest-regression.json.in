@@ -75,7 +75,10 @@
             "starFusion.runStarFusion.timeout": 1
         },
         "description": "STAR-Fusion workflow test",
-        "engineArguments": {},
+        "engineArguments": {
+           "read_from_cache": false,
+           "write_to_cache": false
+        },
         "id": "STAR-Fusion_golden_data",
         "metadata": {
             "starFusion.fusionCodingEffects": {
