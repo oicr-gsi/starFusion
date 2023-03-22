@@ -2,6 +2,8 @@
 
 Workflow that takes a fastq pair or optionally a chimeric file from STAR and detects RNA-seq fusion events.
 
+## Overview
+
 ## Dependencies
 
 * [star-fusion-genome 1.8.1-hg38](https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/__genome_libs_StarFv1.8)
@@ -21,6 +23,8 @@ java -jar cromwell.jar run starFusion.wdl --inputs inputs.json
 Parameter|Value|Description
 ---|---|---
 `inputFqs`|Array[Pair[File,File]]|Array of fastq read pairs
+`reference`|String|Version of reference genome
+`outputFilePrefix`|String|Prefix of outptu file
 
 
 #### Optional workflow parameters:
@@ -32,9 +36,6 @@ Parameter|Value|Default|Description
 #### Optional task parameters:
 Parameter|Value|Default|Description
 ---|---|---|---
-`runStarFusion.starFusion`|String|"$STAR_FUSION_ROOT/STAR-Fusion"|Name of the STAR-Fusion binary
-`runStarFusion.modules`|String|"star-fusion/1.8.1 star-fusion-genome/1.8.1-hg38"|Names and versions of STAR-Fusion and STAR-Fusion genome to load
-`runStarFusion.genomeDir`|String|"$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"|Path to the STAR-Fusion genome directory
 `runStarFusion.threads`|Int|8|Requested CPU threads
 `runStarFusion.jobMemory`|Int|64|Memory allocated for this job
 `runStarFusion.timeout`|Int|72|Hours before task timeout
@@ -49,6 +50,7 @@ Output | Type | Description
 `fusionCodingEffects`|File|Annotated fusion output tsv
 
 
+./commands.txt found, printing out the content...
 ## Commands
  
  This section lists command(s) run by starFusion workflow
@@ -74,5 +76,3 @@ Output | Type | Description
  ## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
-
-_Generated with generate-markdown-readme (https://github.com/oicr-gsi/gsi-wdl-tools/)_

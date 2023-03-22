@@ -33,6 +33,8 @@ Map[String, GenomeResources] resources = {
   parameter_meta {
     inputFqs: "Array of fastq read pairs"
     chimeric: "Path to Chimeric.out.junction"
+    reference: "Version of reference genome"
+    outputFilePrefix: "Prefix of outptu file"
   }
 
   call runStarFusion { 
@@ -43,7 +45,7 @@ Map[String, GenomeResources] resources = {
     modules = resources[reference].modules,
     starFusion = resources[reference].starFusion,
     genomeDir = resources[reference].genomeDir,
-    outputFilePrefix = outputFilePrefix
+    outputFilePrefix = outputFilePrefix,
     }
 
   output {
@@ -106,9 +108,9 @@ task runStarFusion {
       --examine_coding_effect \
       --CPU "~{threads}" --chimeric_junction "~{chimeric}"
 
-      mv ~{outdir}/star-fusion.fusion_predictions.tsv ~{outdir}/{outputFilePrefix}.star-fusion.fusion_predictions.tsv
-      mv ~{outdir}/star-fusion.fusion_predictions.abridged.tsv ~{outdir}/{outputFilePrefix}.star-fusion.fusion_predictions.abridged.tsv
-      mv ~{outdir}/star-fusion.fusion_predictions.abridged.coding_effect.tsv ~{outdir}/{outputFilePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv
+      mv ~{outdir}/star-fusion.fusion_predictions.tsv ~{outdir}/~{outputFilePrefix}.star-fusion.fusion_predictions.tsv
+      mv ~{outdir}/star-fusion.fusion_predictions.abridged.tsv ~{outdir}/~{outputFilePrefix}.star-fusion.fusion_predictions.abridged.tsv
+      mv ~{outdir}/star-fusion.fusion_predictions.abridged.coding_effect.tsv ~{outdir}/~{outputFilePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv
   >>>
 
   runtime {
@@ -119,9 +121,9 @@ task runStarFusion {
   }
 
   output {
-      File fusionPredictions =          "~{outdir}/{outputFilePrefix}.star-fusion.fusion_predictions.tsv"
-      File fusionPredictionsAbridged =  "~{outdir}/{outputFilePrefix}.star-fusion.fusion_predictions.abridged.tsv"
-      File fusionCodingEffects =        "~{outdir}/{outputFilePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv"
+      File fusionPredictions =          "~{outdir}/~{outputFilePrefix}.star-fusion.fusion_predictions.tsv"
+      File fusionPredictionsAbridged =  "~{outdir}/~{outputFilePrefix}.star-fusion.fusion_predictions.abridged.tsv"
+      File fusionCodingEffects =        "~{outdir}/~{outputFilePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv"
   }
 
   meta {
@@ -133,3 +135,4 @@ task runStarFusion {
   }
 
 }
+
