@@ -2,7 +2,6 @@
 
 Workflow that takes a fastq pair or optionally a chimeric file from STAR and detects RNA-seq fusion events.
 
-## Overview
 
 ## Dependencies
 
@@ -24,7 +23,7 @@ Parameter|Value|Description
 ---|---|---
 `inputFqs`|Array[Pair[File,File]]|Array of fastq read pairs
 `reference`|String|Version of reference genome
-`outputFilePrefix`|String|Prefix of outptu file
+`outputFileNamePrefix`|String|Prefix of outptu file
 
 
 #### Optional workflow parameters:
@@ -50,7 +49,6 @@ Output | Type | Description
 `fusionCodingEffects`|File|Annotated fusion output tsv
 
 
-./commands.txt found, printing out the content...
 ## Commands
  
  This section lists command(s) run by starFusion workflow
