@@ -68,7 +68,7 @@
                 }
             ],
             "starFusion.reference": "hg38",
-            "starFusion.outputFilePrefix": "STAR-Fusion_golden_data",
+            "starFusion.outputFileNamePrefix": "STAR-Fusion_golden_data",
             "starFusion.runStarFusion.jobMemory": null,
             "starFusion.runStarFusion.threads": null,
             "starFusion.runStarFusion.timeout": 1
