@@ -1,11 +1,26 @@
 version 1.0
 
+struct GenomeResources {
+    String modules
+    String starFusion
+    String genomeDir
+}
+
 workflow starFusion {
   input {
     Array[Pair[File, File]] inputFqs
     File? chimeric
+    String reference
+    String outputFileNamePrefix
   }
 
+Map[String, GenomeResources] resources = {
+  "hg38": {
+    		"modules" : "star-fusion/1.8.1 star-fusion-genome/1.8.1-hg38",
+        "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+        "genomeDir": "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
+  }
+}
   ## NOTE: if chimeric file is given, the fastq files will not be used for anything, but are still required arguments.
   ##     : starFusion does NOT accept multiple fastq pairs, so in this case, the chimeric file MUST be given.
   ## TODO: if multiple fastqs are supplied as input, and a chimeric file is NOT: concatenate, and use the concatenated pair as input.
@@ -18,9 +33,20 @@ workflow starFusion {
   parameter_meta {
     inputFqs: "Array of fastq read pairs"
     chimeric: "Path to Chimeric.out.junction"
+    reference: "Version of reference genome"
+    outputFileNamePrefix: "Prefix of outptu file"
   }
 
-  call runStarFusion { input: fastq1 = fastq1, fastq2 = fastq2, chimeric = chimeric }
+  call runStarFusion { 
+    input: 
+    fastq1 = fastq1, 
+    fastq2 = fastq2, 
+    chimeric = chimeric,
+    modules = resources[reference].modules,
+    starFusion = resources[reference].starFusion,
+    genomeDir = resources[reference].genomeDir,
+    outputFileNamePrefix = outputFileNamePrefix,
+    }
 
   output {
     File fusions = runStarFusion.fusionPredictions
@@ -51,12 +77,13 @@ task runStarFusion {
     Array[File] fastq1
     Array[File] fastq2
     File? chimeric
-    String starFusion = "$STAR_FUSION_ROOT/STAR-Fusion"
-    String modules = "star-fusion/1.8.1 star-fusion-genome/1.8.1-hg38"
-    String genomeDir = "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
+    String starFusion
+    String modules
+    String genomeDir
     Int threads = 8
     Int jobMemory = 64
     Int timeout = 72
+    String outputFileNamePrefix
   }
 
   parameter_meta {
@@ -80,6 +107,10 @@ task runStarFusion {
       --right_fq ~{sep="," fastq2} \
       --examine_coding_effect \
       --CPU "~{threads}" --chimeric_junction "~{chimeric}"
+
+      mv ~{outdir}/star-fusion.fusion_predictions.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.tsv
+      mv ~{outdir}/star-fusion.fusion_predictions.abridged.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.tsv
+      mv ~{outdir}/star-fusion.fusion_predictions.abridged.coding_effect.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv
   >>>
 
   runtime {
@@ -90,9 +121,9 @@ task runStarFusion {
   }
 
   output {
-      File fusionPredictions =          "~{outdir}/star-fusion.fusion_predictions.tsv"
-      File fusionPredictionsAbridged =  "~{outdir}/star-fusion.fusion_predictions.abridged.tsv"
-      File fusionCodingEffects =        "~{outdir}/star-fusion.fusion_predictions.abridged.coding_effect.tsv"
+      File fusionPredictions =          "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.tsv"
+      File fusionPredictionsAbridged =  "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.tsv"
+      File fusionCodingEffects =        "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv"
   }
 
   meta {
@@ -104,3 +135,4 @@ task runStarFusion {
   }
 
 }
+

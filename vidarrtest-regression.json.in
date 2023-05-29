@@ -67,10 +67,9 @@
                     }
                 }
             ],
-            "starFusion.runStarFusion.genomeDir": null,
+            "starFusion.reference": "hg38",
+            "starFusion.outputFileNamePrefix": "STAR-Fusion_golden_data",
             "starFusion.runStarFusion.jobMemory": null,
-            "starFusion.runStarFusion.modules": null,
-            "starFusion.runStarFusion.starFusion": null,
             "starFusion.runStarFusion.threads": null,
             "starFusion.runStarFusion.timeout": 1
         },
