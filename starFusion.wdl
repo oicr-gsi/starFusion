@@ -68,6 +68,20 @@ Map[String, GenomeResources] resources = {
       url: "https://github.com/STAR-Fusion/STAR-Fusion/wiki"
      }
     ]
+    output_meta: {
+      fusions: {
+        description: "Tab-delimited fusion predictions.",
+        vidarr_label: "fusions"
+      },
+      fusionsAbridged: {
+        description: "Tab-delimited fusion predictions, excluding the identification of the evidence fusion reads.",
+        vidarr_label: "fusionsAbridged"
+      },
+      fusionCodingEffects: {
+        description: "Fusion predictions with appended column showing effect on coding genes.",
+        vidarr_label: "fusionCodingEffects"
+      }
+    }
   }
 
 }
