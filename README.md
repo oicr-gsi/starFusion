@@ -42,11 +42,11 @@ Parameter|Value|Default|Description
 
 ### Outputs
 
-Output | Type | Description
----|---|---
-`fusions`|File|Raw fusion output tsv
-`fusionsAbridged`|File|Abridged fusion output tsv
-`fusionCodingEffects`|File|Annotated fusion output tsv
+Output | Type | Description | Labels
+---|---|---|---
+`fusions`|File|Tab-delimited fusion predictions.|vidarr_label: fusions
+`fusionsAbridged`|File|Tab-delimited fusion predictions, excluding the identification of the evidence fusion reads.|vidarr_label: fusionsAbridged
+`fusionCodingEffects`|File|Fusion predictions with appended column showing effect on coding genes.|vidarr_label: fusionCodingEffects
 
 
 ## Commands
@@ -74,3 +74,5 @@ Output | Type | Description
  ## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
+
+_Generated with generate-markdown-readme (https://github.com/oicr-gsi/gsi-wdl-tools/)_
