@@ -2,6 +2,7 @@ version 1.0
 
 struct GenomeResources {
     String modules
+    String data_modules
     String starFusion
     String genomeDir
 }
@@ -12,11 +13,14 @@ workflow starFusion {
     File? chimeric
     String reference
     String outputFileNamePrefix
+    String local_code_modulefile_path  = "/home/ubuntu/local_modules/gsi/modulator/modulefiles/Ubuntu24.04"
+    String local_data_modulefile_path  = "/home/ubuntu/local_modules/gsi/modulator/modulefiles/data"
   }
 
 Map[String, GenomeResources] resources = {
   "hg38": {
-    		"modules" : "star-fusion/1.8.1 star-fusion-genome/1.8.1-hg38",
+    		"modules" : "star-fusion/1.15.1",
+        "data_modules": "star-fusion-genome/1.10.0-hg38",
         "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
         "genomeDir": "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
   }
@@ -35,6 +39,8 @@ Map[String, GenomeResources] resources = {
     chimeric: "Path to Chimeric.out.junction"
     reference: "Version of reference genome"
     outputFileNamePrefix: "Prefix of outptu file"
+    local_code_modulefile_path: "Path to locally build code modulefiles"
+    local_data_modulefile_path: "Path to locally build data modulefiles"
   }
 
   call runStarFusion { 
@@ -43,6 +49,9 @@ Map[String, GenomeResources] resources = {
     fastq2 = fastq2, 
     chimeric = chimeric,
     modules = resources[reference].modules,
+    data_modules = resources[reference].data_modules,
+    local_code_modulefile_path = local_code_modulefile_path,
+    local_data_modulefile_path = local_data_modulefile_path,
     starFusion = resources[reference].starFusion,
     genomeDir = resources[reference].genomeDir,
     outputFileNamePrefix = outputFileNamePrefix,
@@ -93,6 +102,9 @@ task runStarFusion {
     File? chimeric
     String starFusion
     String modules
+    String data_modules
+    String local_code_modulefile_path
+    String local_data_modulefile_path
     String genomeDir
     Int threads = 8
     Int jobMemory = 64
@@ -105,7 +117,10 @@ task runStarFusion {
     fastq2: "Array of paths to the fastq files for read 2"
     chimeric: "Path to Chimeric.out.junction"
     starFusion: "Name of the STAR-Fusion binary"
-    modules: "Names and versions of STAR-Fusion and STAR-Fusion genome to load"
+    modules: "Names and versions of STAR-Fusion"
+    data_modules: "Names and versions STAR-Fusion genome to load"
+    local_code_modulefile_path: "Path to locally build code modulefiles"
+    local_data_modulefile_path: "Path to locally build data modulefiles"
     genomeDir: "Path to the STAR-Fusion genome directory"
     threads: "Requested CPU threads"
     jobMemory: "Memory allocated for this job"
@@ -115,6 +130,13 @@ task runStarFusion {
   String outdir = "STAR-Fusion_outdir"
 
   command <<<
+        . /usr/share/modules/init/bash
+      module use ~{local_code_modulefile_path }
+      module load ~{modules}
+      module use ~{local_data_modulefile_path }
+      module load ~{data_modules}
+
+
       "~{starFusion}" \
       --genome_lib_dir "~{genomeDir}" \
       --left_fq ~{sep="," fastq1} \
