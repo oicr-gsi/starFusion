@@ -19,8 +19,8 @@ workflow starFusion {
 
 Map[String, GenomeResources] resources = {
   "hg38": {
-    		"modules" : "star-fusion/1.15.1",
-        "data_modules": "star-fusion-genome/1.10.0-hg38",
+    		"modules" : "star-fusion/1.8.1",
+        "data_modules": "star-fusion-genome/1.8.1-hg38",
         "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
         "genomeDir": "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
   }
@@ -151,7 +151,6 @@ task runStarFusion {
 
   runtime {
     memory:  "~{jobMemory} GB"
-    modules: "~{modules}"
     cpu:     "~{threads}"
     timeout: "~{timeout}"
   }
