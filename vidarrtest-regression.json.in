@@ -3,7 +3,7 @@
         "arguments": {
             "starFusion.chimeric": {
                 "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/starfusion/test_inputs/test.Chimeric.out.junction",
+                    "configuration": "/.mounts/labs/gsi/testdata/starfusion/test_inputs/test_1.Chimeric.out.junction",
                     "externalIds": [
                         {
                             "id": "TEST",
