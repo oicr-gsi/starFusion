@@ -16,7 +16,7 @@ workflow starFusion {
 Map[String, GenomeResources] resources = {
   "hg38": {
         "starFusion": "STAR-Fusion",
-        "genomeDir": "/home/ubuntu//module_data/starfusion_data/ctat_genome_lib_build_dir"
+        "genomeDir": "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir"
   }
 }
   ## NOTE: if chimeric file is given, the fastq files will not be used for anything, but are still required arguments.
@@ -89,52 +89,49 @@ task runStarFusion {
     Array[File] fastq2
     File? chimeric
     String starFusion
-    String docker = "star-fusion:1.8.1"
-    File genomeDir
+    String docker = "kevin2peng/star-fusion:1.8.1"
+    String genomeDir  
     Int threads = 8
     Int jobMemory = 64
     Int timeout = 72
     String outputFileNamePrefix
   }
 
-  parameter_meta {
-    fastq1: "Array of paths to the fastq files for read 1"
-    fastq2: "Array of paths to the fastq files for read 2"
-    chimeric: "Path to Chimeric.out.junction"
-    starFusion: "Name of the STAR-Fusion binary"
-    docker: "Names and versions of STAR-Fusion docker image"
-    genomeDir: "Path to the STAR-Fusion genome directory"
-    threads: "Requested CPU threads"
-    jobMemory: "Memory allocated for this job"
-    timeout: "Hours before task timeout"
-  }
-
   String outdir = "STAR-Fusion_outdir"
 
   command <<<
+    LEFT_FQ="~{sep=',' fastq1}"
+    RIGHT_FQ="~{sep=',' fastq2}"
+    
+    # If input contains our dummy file, use /dev/null
+    if [ "${LEFT_FQ}" = "devnull" ]; then
+      LEFT_FQ="/dev/null"
+      RIGHT_FQ="/dev/null"
+    fi
 
-      ~{starFusion} \
+    ~{starFusion} \
       --genome_lib_dir "~{genomeDir}" \
-      --left_fq ~{sep="," fastq1} \
-      --right_fq ~{sep="," fastq2} \
+      --left_fq ${LEFT_FQ} \
+      --right_fq ${RIGHT_FQ} \
       --examine_coding_effect \
-      --CPU "~{threads}" --chimeric_junction "~{chimeric}"
+      --CPU "~{threads}" ~{if defined(chimeric) then "--chimeric_junction \"" + chimeric + "\"" else ""}
 
-      mv ~{outdir}/star-fusion.fusion_predictions.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.tsv
-      mv ~{outdir}/star-fusion.fusion_predictions.abridged.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.tsv
-      mv ~{outdir}/star-fusion.fusion_predictions.abridged.coding_effect.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv
+    mv ~{outdir}/star-fusion.fusion_predictions.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.tsv
+    mv ~{outdir}/star-fusion.fusion_predictions.abridged.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.tsv
+    mv ~{outdir}/star-fusion.fusion_predictions.abridged.coding_effect.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv
   >>>
 
   runtime {
     memory:  "~{jobMemory} GB"
     cpu:     "~{threads}"
-    docker: "~{docker}"
+    timeout: "~{timeout}"
+    docker:  "~{docker}"
   }
 
   output {
-      File fusionPredictions =          "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.tsv"
-      File fusionPredictionsAbridged =  "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.tsv"
-      File fusionCodingEffects =        "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv"
+    File fusionPredictions = "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.tsv"
+    File fusionPredictionsAbridged = "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.tsv"
+    File fusionCodingEffects = "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv"
   }
 
   meta {
