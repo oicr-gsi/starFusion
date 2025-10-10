@@ -104,10 +104,12 @@ task runStarFusion {
     RIGHT_FQ="~{sep=',' fastq2}"
     
     # If input contains our dummy file, use /dev/null
-    if [ "${LEFT_FQ}" = "devnull" ]; then
-      LEFT_FQ="/dev/null"
-      RIGHT_FQ="/dev/null"
-    fi
+    case "${LEFT_FQ}" in
+      *devnull*)
+        LEFT_FQ="/dev/null"
+        RIGHT_FQ="/dev/null"
+        ;;
+    esac
 
     ~{starFusion} \
       --genome_lib_dir "~{genomeDir}" \
