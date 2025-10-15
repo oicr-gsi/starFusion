@@ -16,7 +16,36 @@ workflow starFusion {
 Map[String, GenomeResources] resources = {
   "hg38": {
         "starFusion": "STAR-Fusion",
-        "genomeDir": "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir"
+        "genomeLibResources": 
+          [
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/AnnotFilterRule.pm",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/PFAM.domtblout.dat.gz",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/blast_pairs.dat.gz",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/blast_pairs.idx",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/fusion_annot_lib.gz",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/fusion_annot_lib.idx",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/pfam_domains.dbm",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_annot.cdna.fa",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_annot.cdna.fa.idx",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_annot.cds",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_annot.cdsplus.fa",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_annot.cdsplus.fa.idx",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_annot.gtf",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_annot.gtf.gene_spans",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_annot.gtf.mini.sortu",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_annot.pep",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_annot.prot_info.dbm",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_genome.fa",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_genome.fa.fai",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_genome.fa.nhr",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_genome.fa.nin",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_genome.fa.nsq",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/trans.blast.align_coords.align_coords.dat",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/trans.blast.align_coords.align_coords.dbm",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/trans.blast.dat.gz",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/__chkpts/",
+            "gs://cromwell-wdl/module_data/starfusion_data/ctat_genome_lib_build_dir/ref_genome.fa.star.idx/"
+          ]
   }
 }
   ## NOTE: if chimeric file is given, the fastq files will not be used for anything, but are still required arguments.
@@ -41,7 +70,7 @@ Map[String, GenomeResources] resources = {
     fastq2 = fastq2, 
     chimeric = chimeric,
     starFusion = resources[reference].starFusion,
-    genomeDir = resources[reference].genomeDir,
+    genomeDir = resources[reference].genomeLibResources,
     outputFileNamePrefix = outputFileNamePrefix,
     }
 
@@ -90,59 +119,67 @@ task runStarFusion {
     File? chimeric
     String starFusion
     String docker = "kevin2peng/star-fusion:1.8.1"
-    String genomeDir  
+    Array[File] genomeLibResources 
     Int threads = 8
     Int jobMemory = 64
-    Int timeout = 72
     String outputFileNamePrefix
   }
-
+  
   String outdir = "STAR-Fusion_outdir"
-
+  
   command <<<
-    LEFT_FQ="~{sep=',' fastq1}"
-    RIGHT_FQ="~{sep=',' fastq2}"
-    
-    # If input contains our dummy file, use /dev/null
-    case "${LEFT_FQ}" in
-      *devnull*)
-        LEFT_FQ="/dev/null"
-        RIGHT_FQ="/dev/null"
-        ;;
-    esac
+      set -euxo pipefail
+  
+      # Recreate the genome lib directory structure
+      GENOME_LOCAL="ctat_genome_lib_build_dir"
+      mkdir -p "$GENOME_LOCAL"
+      
+      # Symlink all reference files maintaining their structure
+      for file in ~{sep=' ' genomeLibResources}; do
+        filename=$(basename "$file")
+        ln -s "$file" "$GENOME_LOCAL/$filename"
+      done
+      
+      LEFT_FQ="~{sep=',' fastq1}"
+      RIGHT_FQ="~{sep=',' fastq2}"
+      
+      case "${LEFT_FQ}" in
+        *devnull*)
+          LEFT_FQ="/dev/null"
+          RIGHT_FQ="/dev/null"
+          ;;
+      esac
 
     ~{starFusion} \
-      --genome_lib_dir "~{genomeDir}" \
+      --genome_lib_dir "$GENOME_LOCAL" \
       --left_fq ${LEFT_FQ} \
       --right_fq ${RIGHT_FQ} \
       --examine_coding_effect \
       --CPU "~{threads}" ~{if defined(chimeric) then "--chimeric_junction \"" + chimeric + "\"" else ""}
-
+    
     mv ~{outdir}/star-fusion.fusion_predictions.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.tsv
     mv ~{outdir}/star-fusion.fusion_predictions.abridged.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.tsv
     mv ~{outdir}/star-fusion.fusion_predictions.abridged.coding_effect.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv
   >>>
-
+  
   runtime {
-    memory:  "~{jobMemory} GB"
-    cpu:     "~{threads}"
-    timeout: "~{timeout}"
-    docker:  "~{docker}"
+    memory: "~{jobMemory} GB"
+    cpu: "~{threads}"
+    docker: "~{docker}"
+    disks: "local-disk 500 SSD"
   }
-
+  
   output {
     File fusionPredictions = "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.tsv"
     File fusionPredictionsAbridged = "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.tsv"
     File fusionCodingEffects = "~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv"
   }
-
+  
   meta {
     output_meta: {
-      fusionPredictions:          "Raw fusion output tsv",
-      fusionPredictionsAbridged:  "Abridged fusion output tsv",
-      fusionCodingEffects:        "Annotated fusion output tsv"
+      fusionPredictions: "Raw fusion output tsv",
+      fusionPredictionsAbridged: "Abridged fusion output tsv",
+      fusionCodingEffects: "Annotated fusion output tsv"
     }
   }
-
 }
-
