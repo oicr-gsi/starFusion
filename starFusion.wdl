@@ -13,13 +13,13 @@ workflow starFusion {
     File? chimeric
     String reference
     String outputFileNamePrefix
-    String local_code_modulefile_path  = "/home/ubuntu/local_modules/gsi/modulator/modulefiles/Ubuntu24.04"
-    String local_data_modulefile_path  = "/home/ubuntu/local_modules/gsi/modulator/modulefiles/data"
+    String local_code_modulefile_path  = "/home/gpeng_oicr_on_ca/local_modules/gsi/modulator/modulefiles/Ubuntu24.04"
+    String local_data_modulefile_path  = "/home/gpeng_oicr_on_ca/local_modules/gsi/modulator/modulefiles/data"
   }
 
 Map[String, GenomeResources] resources = {
   "hg38": {
-    		"modules" : "star-fusion/1.8.1",
+                "modules" : "star-fusion/1.8.1",
         "data_modules": "star-fusion-genome/1.8.1-hg38",
         "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
         "genomeDir": "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
@@ -130,13 +130,17 @@ task runStarFusion {
   String outdir = "STAR-Fusion_outdir"
 
   command <<<
-        . /usr/share/modules/init/bash
+    set -e
+    export TMPDIR=$(pwd)/tmp
+    mkdir -p $TMPDIR
+
+     . /usr/share/modules/init/bash
       module use ~{local_code_modulefile_path }
       module load ~{modules}
       module use ~{local_data_modulefile_path }
       module load ~{data_modules}
 
-
+    
       "~{starFusion}" \
       --genome_lib_dir "~{genomeDir}" \
       --left_fq ~{sep="," fastq1} \
@@ -144,9 +148,11 @@ task runStarFusion {
       --examine_coding_effect \
       --CPU "~{threads}" --chimeric_junction "~{chimeric}"
 
+      rm -rf $TMPDIR
       mv ~{outdir}/star-fusion.fusion_predictions.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.tsv
       mv ~{outdir}/star-fusion.fusion_predictions.abridged.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.tsv
       mv ~{outdir}/star-fusion.fusion_predictions.abridged.coding_effect.tsv ~{outdir}/~{outputFileNamePrefix}.star-fusion.fusion_predictions.abridged.coding_effect.tsv
+      
   >>>
 
   runtime {
@@ -170,4 +176,3 @@ task runStarFusion {
   }
 
 }
-
