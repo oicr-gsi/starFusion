@@ -16,7 +16,14 @@ workflow starFusion {
   }
 
 Map[String, Map[String, GenomeResources]] resources = {
-  "hg38": {
+   "hg19": {
+    "31": {
+      "modules" : "star-fusion/1.6.0 star-fusion-genome/1.6.0-hg19",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_HG19_ROOT/ctat_genome_lib_build_dir"
+    }
+   },
+   "hg38": {
     "44": {
       "modules" : "star-fusion/1.8.1 star-fusion-hg38/20231029-gencode44",
       "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
