@@ -9,6 +9,7 @@ Workflow that takes a fastq pair or optionally a chimeric file from STAR and det
 * [star-fusion-genome 1.8.1-hg38](https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/__genome_libs_StarFv1.8)
 * [star-fusion 1.8.1](https://github.com/STAR-Fusion/STAR-Fusion/wiki)
 
+StarFusion resources are generated using the primary assembly genome FASTA file as the reference input
 
 ## Usage
 
