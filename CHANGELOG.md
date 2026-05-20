@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.2] - 2026-05-13
 ### Added
 - [GRD-1175](https://jira.oicr.on.ca/browse/GRD-1175)
-- Added gencode as a required workflow input to support gencode version selection via olive assay_confirguration.
+- Added gencode as a required workflow input to support gencode version selection via olive assay_configuration.
+- added hg38_noAlt and grch38 assembly support
 ### Changed
 - Branching by gencode version, analogous to other gencode-using workflows
 
