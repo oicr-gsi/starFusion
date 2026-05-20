@@ -12,13 +12,52 @@ workflow starFusion {
     File? chimeric
     String reference
     String outputFileNamePrefix
+    String gencode
   }
 
-Map[String, GenomeResources] resources = {
-  "hg38": {
-    		"modules" : "star-fusion/1.8.1 star-fusion-hg38/20231029-gencode44",
-        "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
-        "genomeDir": "$STAR_FUSION_HG38_ROOT/ctat_genome_lib_build_dir"
+Map[String, Map[String, GenomeResources]] resources = {
+   "hg19": {
+    "31": {
+      "modules" : "star-fusion/1.6.0 star-fusion-genome/1.6.0-hg19",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_HG19_ROOT/ctat_genome_lib_build_dir"
+    }
+   },
+   "hg38": {
+    "44": {
+      "modules" : "star-fusion/1.8.1 star-fusion-hg38/20231029-gencode44",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_HG38_ROOT/ctat_genome_lib_build_dir"
+    },
+    "31": {
+      "modules" : "star-fusion/1.8.1 star-fusion-genome/1.8.1-hg38",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
+    }
+  },
+  "hg38_noAlt": {
+    "44": {
+      "modules" : "star-fusion/1.8.1 star-fusion-hg38/20231029-gencode44",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_HG38_ROOT/ctat_genome_lib_build_dir"
+    },
+    "31": {
+      "modules" : "star-fusion/1.8.1 star-fusion-genome/1.8.1-hg38",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
+    }
+  },
+  "grch38": {
+    "44": {
+      "modules" : "star-fusion/1.8.1 star-fusion-hg38/20231029-gencode44",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_HG38_ROOT/ctat_genome_lib_build_dir"
+    },
+    "31": {
+      "modules" : "star-fusion/1.8.1 star-fusion-genome/1.8.1-hg38",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
+    }
   }
 }
   ## NOTE: if chimeric file is given, the fastq files will not be used for anything, but are still required arguments.
@@ -35,6 +74,7 @@ Map[String, GenomeResources] resources = {
     chimeric: "Path to Chimeric.out.junction"
     reference: "Version of reference genome"
     outputFileNamePrefix: "Prefix of outptu file"
+    gencode: "Gencode version e.g. 44"
   }
 
   call runStarFusion { 
@@ -42,9 +82,9 @@ Map[String, GenomeResources] resources = {
     fastq1 = fastq1, 
     fastq2 = fastq2, 
     chimeric = chimeric,
-    modules = resources[reference].modules,
-    starFusion = resources[reference].starFusion,
-    genomeDir = resources[reference].genomeDir,
+    modules = resources[reference][gencode].modules,
+    starFusion = resources[reference][gencode].starFusion,
+    genomeDir = resources[reference][gencode].genomeDir,
     outputFileNamePrefix = outputFileNamePrefix,
     }
 
@@ -55,8 +95,8 @@ Map[String, GenomeResources] resources = {
   }
 
   meta {
-    author: "Heather Armstrong"
-    email: "heather.armstrong@oicr.on.ca"
+    author: "Heather Armstrong, Monica L. Rojas-Pena"
+    email: "heather.armstrong@oicr.on.ca, mrojaspena@oicr.on.ca"
     description: "Workflow that takes a fastq pair or optionally a chimeric file from STAR and detects RNA-seq fusion events."
     dependencies: [
      {
