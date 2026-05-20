@@ -34,6 +34,30 @@ Map[String, Map[String, GenomeResources]] resources = {
       "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
       "genomeDir": "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
     }
+  },
+  "hg38_noAlt": {
+    "44": {
+      "modules" : "star-fusion/1.8.1 star-fusion-hg38/20231029-gencode44",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_HG38_ROOT/ctat_genome_lib_build_dir"
+    },
+    "31": {
+      "modules" : "star-fusion/1.8.1 star-fusion-genome/1.8.1-hg38",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
+    }
+  },
+  "grch38": {
+    "44": {
+      "modules" : "star-fusion/1.8.1 star-fusion-hg38/20231029-gencode44",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_HG38_ROOT/ctat_genome_lib_build_dir"
+    },
+    "31": {
+      "modules" : "star-fusion/1.8.1 star-fusion-genome/1.8.1-hg38",
+      "starFusion": "$STAR_FUSION_ROOT/STAR-Fusion",
+      "genomeDir": "$STAR_FUSION_GENOME_ROOT/ctat_genome_lib_build_dir"
+    }
   }
 }
   ## NOTE: if chimeric file is given, the fastq files will not be used for anything, but are still required arguments.
